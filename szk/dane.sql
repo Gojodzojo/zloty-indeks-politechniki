@@ -1,33 +1,43 @@
-INSERT INTO opiekunowie VALUES
-	(1, 'Katarzyna', 'Nogły', 666666666, 'dfsl@ss.pl'),
-  	(2, 'Marcin', 'Adamczyk', 666666666, 'dfsl@ss.pl'),
-  	(3, 'Grzegorz', 'Łopatka', 666666666, 'dfsl@ss.pl');
+CREATE TABLE opiekunowie (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    imie VARCHAR(20) NOT NULL,
+    nazwisko VARCHAR(20) NOT NULL,
+    nr telefonu VARCHAR(20) NOT NULL,
+    adres_mailowy VARCHAR(20) NOT NULL
+);
 
-INSERT INTO uczniowie VALUES
-	(1, 'Mateusz', 'Goik', '2003-06-06', 'Wilcza', 1, 2),
-	(2, 'Magdalena', 'Hanak', '2003-11-21', 'Rybnik', 2, NULL),
-	(3, 'Łukasz', 'Goik', '2014-13-06', 'Rybnik', 2, 3);
+CREATE TABLE uczniowie (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    imię VARCHAR(20) NOT NULL,
+    nazwisko VARCHAR(20) NOT NULL,
+    data_urodzenia DATE NOT NULL,
+    miejsce_zamieszkania VARCHAR(20) NOT NULL,
+    opiekun_id INTEGER NOT NULL,
+    opiekun_id2 INTEGER,
+    FOREIGN KEY (opiekun_id) REFERENCES opiekunowie(id) ON DELETE SET NULL,
+    FOREIGN KEY (opiekun_id2) REFERENCES opiekunowie(id) ON DELETE SET NULL
+);
 
+CREATE TABLE typy_sprawdzianow (
+    typ VARCHAR(20) PRIMARY KEY NOT NULL,
+    waga INTEGER NOT NULL check (waga >= 0)
+);
 
-INSERT INTO typy_sprawdzianow VALUES
-    ('kartkówka', 2),
-    ('klasówka', 3),
-    ('test', 1);
+CREATE TABLE sprawdziany (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    opis VARCHAR(50) NOT NULL,
+    poziom VARCHAR(20) NOT NULL,
+    sciezka_do_pliku VARCHAR(100) NOT NULL,
+    typ VARCHAR(20) NOT NULL,
+    FOREIGN KEY (typ) REFERENCES typy_sprawdzianow(typ)
+);
 
-INSERT INTO sprawdziany VALUES 
-    (1, 'Matematyczny', 'I', 'matematyczny.pdf', 'kartkówka'),
-    (2, 'Językowy', 'II', 'językowy.pdf', 'klasówka'),
-    (3, 'Humor', 'III', 'humor.pdf', 'test');
-
-INSERT INTO oceny VALUES
-    (1, 1, '2017-01-01', 1, 1),
-    (2, 5, '2018-01-01', 2, 1),
-    (3, 6, '2019-01-01', 3, 1),
-    (4, 7, '2019-10-09', 1, 2),
-    (5, 8, '2003-04-11', 2, 2),
-    (6, 9, '2018-3-05', 3, 2),
-    (7, 1, '2018-3-05', 2, 3),
-    (8, 1, '2018-3-05', 3, 2),
-    (9, 1, '2018-3-05', 2, 3),
-    (10, 1, '2018-3-05', 2, 3),
-    (11, 3, '2020-6-11', 1, 2);
+CREATE TABLE oceny (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    ocena INTEGER NOT NULL,
+    data_otrzymania DATE NOT NULL,
+    sprawdzian_id INTEGER NOT NULL,
+    uczen_id INTEGER NOT NULL,
+    FOREIGN KEY (sprawdzian_id) REFERENCES sprawdziany(id) ON DELETE RESTRICT,
+    FOREIGN KEY (uczen_id) REFERENCES uczniowie(id) ON DELETE CASCADE
+);
