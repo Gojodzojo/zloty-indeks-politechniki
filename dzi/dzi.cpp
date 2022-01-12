@@ -2,46 +2,52 @@
 #include <vector>
 #include <set>
 
-
 using namespace std;
 
-int maksymalna_liczba_energii(vector<char>& pola, set<int>& pozycje_x, set<int>& pozycje_y, int n)
+int kadane_1D(vector<int> a)
 {
-    if(pozycje_x.size() == 0)
+    int best_sum = 0, current_sum = 0;
+
+    for (auto field : a)
     {
-        return 0;
+        current_sum += field;
+
+        if (current_sum > best_sum)
+        {
+            best_sum = current_sum;
+        }
+        else if (current_sum < 0)
+        {
+            current_sum = 0;
+        }
     }
 
-    int max = 0;
-    
-    for(int max_x: pozycje_x)
+    return best_sum;
+}
+
+int kadane_2D(vector<char> fields, int n)
+{
+    int best_sum = 0;
+
+    for (int start_index = 0; start_index < n; start_index++)
     {
-        for(int min_x: pozycje_x)
+        vector<int> columns_sums(n, 0);
+        for (int i = start_index; i < n; i++)
         {
-            for(int max_y: pozycje_y)
+            for (int j = 0; j < n; j++)
             {
-                for(int min_y: pozycje_y)
-                {
-                    int suma_energii = 0;
+                columns_sums[j] += fields[j * n + i];
+            }
 
-                    for(int x = min_x; x <= max_x; x++)
-                    {
-                        for(int y = min_y; y <= max_y; y++)
-                        {
-                            suma_energii += pola[y*n+x];
-                        }
-                    }
-
-                    if(suma_energii > max)
-                    {
-                        max = suma_energii;
-                    }
-                }
+            int current_sum = kadane_1D(columns_sums);
+            if (current_sum > best_sum)
+            {
+                best_sum = current_sum;
             }
         }
     }
 
-    return max;
+    return best_sum;
 }
 
 int main()
@@ -51,29 +57,22 @@ int main()
         int n;
         cin >> n;
 
-        if (n == 0) break;
+        if (n == 0)
+            break;
 
-        vector<char> pola(n * n);
-        set<int> pozycje_x;
-        set<int> pozycje_y;
+        vector<char> fields(n * n);
 
         for (int y = 0; y < n; y++)
         {
             for (int x = 0; x < n; x++)
             {
-                int pole;
-                cin >> pole;
-                pola[y * n + x] = pole;
-
-                if (pole > 0)
-                {
-                    pozycje_x.insert(x);
-                    pozycje_y.insert(y);
-                }
+                int field;
+                cin >> field;
+                fields[y * n + x] = field;
             }
         }
 
-        cout << maksymalna_liczba_energii(pola, pozycje_x, pozycje_y, n) << '\n';
+        cout << kadane_2D(fields, n) << '\n';
     }
 
     return 0;
